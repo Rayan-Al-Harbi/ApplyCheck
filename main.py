@@ -1,4 +1,6 @@
 from extraction import extract_job_profile, extract_cv_profile
+from chunking import chunk_cv
+from rag import store_cv_chunks, retrieve_relevant_chunks
 
 
 # --- Sample job description ---
@@ -58,6 +60,7 @@ Take full ownership of your tasks from development through merge.
 Contribute to team growth by questioning, learning, and improving processes.
 
  """
+
 # --- Sample CV ---
 sample_cv = """
 Name: Sarah Chen
@@ -81,15 +84,35 @@ Education:
 
 
 if __name__ == "__main__":
+    # Step 1: Extract job profile
     print("=" * 50)
     print("Extracting Job Profile...")
     print("=" * 50)
     job_profile = extract_job_profile(sample_job)
     print(job_profile.model_dump_json(indent=2))
 
+    # Step 2: Chunk CV and store in Qdrant
     print()
     print("=" * 50)
-    print("Extracting Candidate Profile...")
+    print("Chunking CV and storing in vector DB...")
     print("=" * 50)
-    candidate_profile = extract_cv_profile(sample_cv)
+    chunks = chunk_cv(sample_cv)
+    store_cv_chunks(chunks)
+    print(f"Stored {len(chunks)} chunks.")
+
+    # Step 3: Retrieve relevant chunks using job skills as query
+    query = ", ".join(job_profile.required_skills)
+    print(f"\nQuerying with: {query}")
+    relevant_chunks = retrieve_relevant_chunks(query, top_k=3)
+    print("\nTop relevant CV chunks:")
+    for i, chunk in enumerate(relevant_chunks, 1):
+        print(f"\n[{i}] (score: {chunk['score']:.4f})\n{chunk['text']}")
+
+    # Step 4: Extract candidate profile from retrieved chunks
+    print()
+    print("=" * 50)
+    print("Extracting Candidate Profile from relevant chunks...")
+    print("=" * 50)
+    retrieved_text = "\n\n".join(c["text"] for c in relevant_chunks)
+    candidate_profile = extract_cv_profile(retrieved_text)
     print(candidate_profile.model_dump_json(indent=2))
