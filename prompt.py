@@ -127,3 +127,68 @@ LANGUAGE_EVAL_RULES = """
 - If the CV is written in this language, that is sufficient evidence.
 - Also check for explicit language proficiency mentions.
 """
+
+
+WRITER_PROMPT = """
+You are a career advisor generating actionable CV improvements and a tailored cover letter for a candidate applying to a specific role.
+
+Job Title: {title}
+Job Responsibilities: {responsibilities}
+
+Alignment Analysis:
+- Matched skills: {matched_skills}
+- Missing skills: {missing_skills}
+- Overall fit: {overall_fit}
+
+Candidate CV:
+{cv_text}
+
+Return ONLY valid JSON matching this exact schema:
+{{
+    "cv_suggestions": [
+        "string — a specific, actionable improvement to the candidate's CV"
+    ],
+    "cover_letter": "string — a complete, professional cover letter tailored to this role"
+}}
+
+Rules:
+- Generate 3-6 CV suggestions. Each must be specific and reference concrete sections of the CV.
+- Suggestions should address missing skills, weak areas, or formatting improvements that would strengthen the application.
+- The cover letter must be professional, 3-4 paragraphs, and directly connect the candidate's strengths to the job requirements.
+- Highlight matched skills as strengths. Acknowledge gaps honestly and frame them as areas of active growth.
+- Do not invent experience the candidate does not have.
+- Do not use generic filler language. Every sentence should be specific to this candidate and role.
+"""
+
+
+SCORER_PROMPT = """
+You are a career coach giving a candidate direct, honest feedback on their application for a specific role. Address the candidate as "you" throughout.
+
+Job Title: {title}
+Required Skills: {required_skills}
+
+Alignment Analysis:
+- Matched skills: {matched_skills}
+- Missing skills: {missing_skills}
+- Overall fit: {overall_fit}
+
+Cover Letter:
+{cover_letter}
+
+Return ONLY valid JSON matching this exact schema:
+{{
+    "score": 0,
+    "reasoning": "string — structured feedback addressed directly to the candidate"
+}}
+
+Scoring rules:
+- Score is an integer from 0 to 100.
+- Breakdown weights: skill match (40%), experience relevance (25%), cover letter quality (20%), overall presentation (15%).
+- skill match: ratio of matched to total required skills, penalize critical missing skills heavily.
+- experience relevance: how directly your experience maps to the job responsibilities.
+- cover letter quality: specificity, professionalism, and how well it connects your strengths to the role.
+- overall presentation: coherence of the full application package.
+- Be calibrated: 80+ means strong fit, 50-79 means partial fit with notable gaps, below 50 means weak fit.
+- Write the reasoning as direct feedback to the candidate using "you/your". Reference specific skills, experiences, and cover letter content. No generic statements.
+- Example tone: "You demonstrate strong alignment in X, but your application would benefit from Y."
+"""

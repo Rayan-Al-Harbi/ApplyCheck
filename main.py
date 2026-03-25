@@ -136,62 +136,57 @@ LANGUAGES
  """
 
 
-if __name__ == "__main__":
-    # Step 1: Extract job profile
-    print("=" * 50)
-    print("Extracting Job Profile...")
-    print("=" * 50)
-    job_profile = extract_job_profile(sample_job)
-    print(job_profile.model_dump_json(indent=2))
+# TODO: remove print_state and clean when deploying (debug only)
+def clean(text: str) -> str:
+    return " ".join(text.split())
 
-    # Step 2: Chunk CV and store in Qdrant
-    print()
-    print("=" * 50)
-    print("Chunking CV and storing in vector DB...")
-    print("=" * 50)
-    chunks = chunk_cv(ray)
-    store_cv_chunks(chunks)
-    print(f"Stored {len(chunks)} chunks.")
 
-    # Step 3: Classify skills by type
+def print_state(state: dict, label: str):
     print()
-    print("=" * 50)
-    print("Classifying Skills...")
-    print("=" * 50)
-    skill_types = classify_skills(job_profile.required_skills)
-    for skill, skill_type in skill_types.items():
-        print(f"  {skill}: {skill_type.value}")
-
-    # Step 4: Per-skill retrieval preview
-    print()
-    print("=" * 50)
-    print("Per-Skill Retrieval Preview...")
-    print("=" * 50)
-    is_short_cv = len(ray.split()) < TOKEN_THRESHOLD
-    for skill in job_profile.required_skills:
-        skill_type = skill_types.get(skill, "?")
-        print(f"\n[Skill: {skill} | type: {skill_type.value if hasattr(skill_type, 'value') else skill_type}]")
-        if is_short_cv:
-            print("  (short CV — full text used, no retrieval)")
+    print("=" * 60)
+    print(f"  Next state: {label}")
+    print("=" * 60)
+    for key, value in state.items():
+        if value is None or key in ("current_agent", "is_complete"):
+            continue
+        if key in ("job_description", "cv_text"):
+            print(f"  {key}: ({len(str(value).split())} words)")
+        elif key == "cover_letter":
+            print(f"  {key}: {clean(str(value))[:200]}...")
+        elif key == "cv_suggestions":
+            print(f"  {key}: [{len(value)} suggestions]")
+            for i, s in enumerate(value, 1):
+                print(f"    {i}. {clean(s)}")
+        elif key == "alignment_analysis":
+            a = value
+            matched = [m.skill for m in a.matched_skills] if hasattr(a, 'matched_skills') else [m["skill"] for m in a["matched_skills"]]
+            missing = a.missing_skills if hasattr(a, 'missing_skills') else a["missing_skills"]
+            print(f"  {key}:")
+            print(f"    matched: {matched}")
+            print(f"    missing: {missing}")
+        elif key == "job_profile":
+            title = value.title if hasattr(value, 'title') else value["title"]
+            skills = value.required_skills if hasattr(value, 'required_skills') else value["required_skills"]
+            print(f"  {key}: {title} ({len(skills)} required skills)")
+        elif key == "score_reasoning":
+            print(f"  {key}: {clean(str(value))}")
         else:
-            kw_hits = keyword_search(skill)
-            sem_hits = [c["text"] for c in retrieve_relevant_chunks(query=skill, top_k=3)
-                        if c["text"] not in kw_hits]
-            if kw_hits:
-                for chunk in kw_hits:
-                    print(f"  [keyword]  {chunk.splitlines()[0][:80].strip()}")
-            else:
-                print("  [keyword]  no exact match")
-            if sem_hits:
-                for chunk in sem_hits:
-                    print(f"  [semantic] {chunk.splitlines()[0][:80].strip()}")
-            else:
-                print("  [semantic] (all top results already in keyword hits)")
+            print(f"  {key}: {value}")
 
-    # Step 5: Run alignment analysis
-    print()
-    print("=" * 50)
-    print("Running Alignment Analysis...")
-    print("=" * 50)
-    analysis = analyze_alignment(job_profile, ray, chunks_stored=True, skill_types=skill_types)
-    print(analysis.model_dump_json(indent=2))
+
+if __name__ == "__main__":
+    from graph import app
+
+    initial_state = {
+        "job_description": sample_job,
+        "cv_text": ray,
+    }
+
+    print("Running LangGraph pipeline...")
+    print("supervisor -> analyzer -> supervisor -> writer -> supervisor -> scorer -> END")
+
+    for event in app.stream(initial_state, stream_mode="updates"):
+        for node_name, updates in event.items():
+            if node_name == "supervisor":
+                continue
+            print_state(updates, node_name)
