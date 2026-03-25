@@ -85,55 +85,6 @@ Experience:
 Education:
 - B.Sc. Computer Science, University of Cityville, 2020
 """
-ray = """Rayan Mazen Alharbi
-
-Riyadh, Saudi Arabia | +966590803444 | RayanMFH111@gmail.com | LinkedIn | GitHub
-
-OBJECTIVE
-Senior Computer Science student specializing in Artificial Intelligence and Machine Learning, with strong experience in Python and data-driven systems. Seeking opportunities to apply AI techniques to real-world problems and contribute to impactful technology solutions.
-
-EDUCATION
-•	Bachelor | Computer Science | Imam Mohammad bin Saud University | August 2022 – Present | GPA 4.69
-EXPERIENCE
-•	AI Team Leader and Member | Enjaz Club | CCIS | (September 2024 – Present)
-o	Participated in online sessions and shared AI concepts between team members.
-o	Led a team of 10+ members to build an AI-focused project and increased member engagement.
-
-CERTIFICATIONS
-•	IBM RAG and Agentic AI | IBM.
-
-•	Machine Learning Specialization | DeepLearning.AI.
-
-•	Deep Learning Specialization | DeepLearning.AI.
-
-•	The Complete Python Pro Bootcamp | Udemy.
-
-•	Responsive Web Design | FreeCodeCamp.
-
-SKILLS
-•	Soft Skills:
-o	Leadership & Team Coordination, Technical Communication, Problem-Solving, Time management.
-•	Technical Skills:
-o	Python, Java, JavaScript, HTML/CSS · TensorFlow, PyTorch, Scikit-learn, NumPy, Pandas,
-LangChain/LangGraph · Next.js, Node.js · MongoDB
-
-PROJECTS
-Mirqab (مرقاب) — Smart Street Pothole Detection System On Drone-Based Footage | Graduation Project (In Progress)
-•	Tech: Python, PyTorch, YOLOv8, OpenCV.
-•	Trained a YOLOv8-based pothole detection model using the Multi-Weather Pothole Detection (MWPD) dataset.
-
-DuaDesign — AI-Powered Personalized Dua Generator | February 2026
-•	Tech: Next.js, TypeScript, RAG, Groq API (Llama 4 Maverick), Orpheus TTS, Vercel.
-•	Built and deployed a RAG pipeline matching user input to authentic references with dynamic context injection to generate personalized, grounded Arabic Duas, generating more than 500 Duas across multiple users.
-
-Eidaah (إيضاح) — AI-Powered Presentation Explainer | Enjaz Club | March 2026
-•	Tech: React, FastAPI, Groq API (Llama 3.3 70B).
-•	Led the AI team to build and deploy a bilingual (Arabic/English) tool that analyzes uploaded PDF/PPTX presentations slide-by-slide, generating educational explanations and real-world examples using LLM inference.
-
-LANGUAGES
-•	Arabic - Native
-•	English – Fluent (Professional working proficiency)
- """
 
 
 # TODO: remove print_state and clean when deploying (debug only)
@@ -179,7 +130,7 @@ if __name__ == "__main__":
 
     initial_state = {
         "job_description": sample_job,
-        "cv_text": ray,
+        "cv_text": sample_cv,
     }
 
     print("Running LangGraph pipeline...")
