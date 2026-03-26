@@ -42,9 +42,9 @@ ApplyCheck takes a CV and a job posting, then runs them through a pipeline of sp
 
 ```
 ├── agents/          # Subagent definitions (analyzer, writer, scorer)
-      ├── analyzer.py
-      ├── scorer.py
-      |__ writer.py
+│   ├── analyzer.py
+│   ├── scorer.py
+│   └── writer.py
 ├── main.py          # Entry point
 ├── graph.py         # LangGraph workflow definition
 ├── state.py         # Shared state schema
@@ -55,7 +55,6 @@ ApplyCheck takes a CV and a job posting, then runs them through a pipeline of sp
 ├── prompt.py        # Prompt templates
 └── analysis.py      # Analysis orchestration
 ```
-
 ## Status
 
 This is an active project exploring multi-agent architectures with LangGraph and RAG pipelines.
