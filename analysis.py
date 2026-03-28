@@ -1,9 +1,13 @@
 import json
 import os
 from groq import Groq
+from dotenv import load_dotenv
 from model import JobProfile, SkillMatch, AlignmentAnalysis, SkillType
 from prompt import SKILL_EVAL_PROMPT, OVERALL_FIT_PROMPT, SKILL_CLASSIFIER_PROMPT, HARD_SKILL_EVAL_RULES, SOFT_SKILL_EVAL_RULES, LANGUAGE_EVAL_RULES
 from rag import retrieve_relevant_chunks, get_cv_context
+from utils import parse_llm_json
+
+load_dotenv()
 
 client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
@@ -17,8 +21,10 @@ def classify_skills(skills: list[str]) -> dict[str, SkillType]:
         temperature=0,
     )
 
-    raw_output = response.choices[0].message.content.strip().strip("```json").strip("```").strip()
-    parsed = json.loads(raw_output)
+    raw = response.choices[0].message.content.strip()
+    if raw.startswith("```"):
+        raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
+    parsed = json.loads(raw)
     return {item["skill"]: SkillType(item["type"]) for item in parsed["classifications"]}
 
 
@@ -39,9 +45,7 @@ def evaluate_skill_match(skill: str, context: str, skill_type: SkillType = Skill
         temperature=0,
     )
 
-    raw_output = response.choices[0].message.content.strip().strip("```json").strip("```").strip()
-    parsed = json.loads(raw_output)
-    return SkillMatch(**parsed)
+    return parse_llm_json(response.choices[0].message.content, SkillMatch)
 
 
 def generate_overall_fit(

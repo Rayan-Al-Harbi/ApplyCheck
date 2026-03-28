@@ -1,8 +1,11 @@
-import json
 import os
 from groq import Groq
+from dotenv import load_dotenv
 from model import AlignmentAnalysis, JobProfile, ScorerOutput
 from prompt import SCORER_PROMPT
+from utils import parse_llm_json
+
+load_dotenv()
 
 client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
@@ -46,8 +49,7 @@ def scorer_node(state) -> dict:
         temperature=0,
     )
 
-    raw = response.choices[0].message.content.strip().strip("```json").strip("```").strip()
-    scorer_output = ScorerOutput.model_validate(json.loads(raw, strict=False))
+    scorer_output = parse_llm_json(response.choices[0].message.content, ScorerOutput)
 
     return {
         "scorer_output": scorer_output,
