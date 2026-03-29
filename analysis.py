@@ -1,6 +1,10 @@
+import logging
 import os
+import time
+
 from groq import Groq
 from dotenv import load_dotenv
+from langsmith import traceable
 from model import JobProfile, SkillMatch, AlignmentAnalysis, SkillType, SkillClassifierOutput
 from prompt import SKILL_EVAL_PROMPT, OVERALL_FIT_PROMPT, SKILL_CLASSIFIER_PROMPT, HARD_SKILL_EVAL_RULES, SOFT_SKILL_EVAL_RULES, LANGUAGE_EVAL_RULES
 from rag import retrieve_relevant_chunks, get_cv_context
@@ -8,10 +12,14 @@ from utils import parse_llm_json
 
 load_dotenv()
 
+logger = logging.getLogger("applycheck.analysis")
+
 client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
 
 def classify_skills(skills: list[str]) -> dict[str, SkillType]:
+    start = time.perf_counter()
+
     prompt = SKILL_CLASSIFIER_PROMPT.format(skills=", ".join(skills))
 
     response = client.chat.completions.create(
@@ -21,6 +29,14 @@ def classify_skills(skills: list[str]) -> dict[str, SkillType]:
     )
 
     result = parse_llm_json(response.choices[0].message.content, SkillClassifierOutput)
+
+    logger.info("Skills classified", extra={"event_data": {
+        "event": "llm_call",
+        "function": "classify_skills",
+        "latency_ms": round((time.perf_counter() - start) * 1000, 2),
+        "skills_count": len(skills),
+    }})
+
     return {item.skill: item.type for item in result.classifications}
 
 
@@ -31,7 +47,10 @@ _RULES_BY_TYPE = {
 }
 
 
+@traceable(name="skill_evaluation", metadata={"component": "analyzer"})
 def evaluate_skill_match(skill: str, context: str, skill_type: SkillType = SkillType.HARD) -> SkillMatch:
+    start = time.perf_counter()
+
     rules = _RULES_BY_TYPE.get(skill_type, HARD_SKILL_EVAL_RULES)
     prompt = SKILL_EVAL_PROMPT.format(skill=skill, context=context, rules=rules)
 
@@ -41,7 +60,18 @@ def evaluate_skill_match(skill: str, context: str, skill_type: SkillType = Skill
         temperature=0,
     )
 
-    return parse_llm_json(response.choices[0].message.content, SkillMatch)
+    result = parse_llm_json(response.choices[0].message.content, SkillMatch)
+
+    logger.info("Skill evaluated", extra={"event_data": {
+        "event": "llm_call",
+        "function": "evaluate_skill_match",
+        "skill": skill,
+        "skill_type": skill_type.value,
+        "matched": result.matched,
+        "latency_ms": round((time.perf_counter() - start) * 1000, 2),
+    }})
+
+    return result
 
 
 def generate_overall_fit(
@@ -49,6 +79,8 @@ def generate_overall_fit(
     matched: list[SkillMatch],
     missing: list[str],
 ) -> str:
+    start = time.perf_counter()
+
     prompt = OVERALL_FIT_PROMPT.format(
         title=job_profile.title,
         matched_list=", ".join([m.skill for m in matched]),
@@ -60,6 +92,12 @@ def generate_overall_fit(
         messages=[{"role": "user", "content": prompt}],
         temperature=0,
     )
+
+    logger.info("Overall fit generated", extra={"event_data": {
+        "event": "llm_call",
+        "function": "generate_overall_fit",
+        "latency_ms": round((time.perf_counter() - start) * 1000, 2),
+    }})
 
     return response.choices[0].message.content.strip()
 

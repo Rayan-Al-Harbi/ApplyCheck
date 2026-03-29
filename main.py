@@ -1,10 +1,16 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+import logging
+import uuid
+from logging_config import setup_logging
 from extraction import extract_job_profile, extract_cv_profile
 from chunking import chunk_cv
 from rag import store_cv_chunks, retrieve_relevant_chunks, get_cv_context, keyword_search, TOKEN_THRESHOLD
 from analysis import analyze_alignment, classify_skills
+
+setup_logging()
+logger = logging.getLogger("applycheck.main")
 
 
 # --- Sample job description ---
@@ -93,53 +99,56 @@ def clean(text: str) -> str:
 
 
 def print_state(state: dict, label: str):
-    print()
-    print("=" * 60)
-    print(f"  Next state: {label}")
-    print("=" * 60)
+    logger.info(f"Node complete: {label}", extra={"event_data": {
+        "event": "node_complete",
+        "node": label,
+    }})
     for key, value in state.items():
         if value is None or key in ("current_agent", "is_complete"):
             continue
         if key in ("job_description", "cv_text"):
-            print(f"  {key}: ({len(str(value).split())} words)")
+            logger.debug(f"{key}: ({len(str(value).split())} words)")
         elif key == "cover_letter":
-            print(f"  {key}: {clean(str(value))[:200]}...")
+            logger.debug(f"{key}: {clean(str(value))[:200]}...")
         elif key == "cv_suggestions":
-            print(f"  {key}: [{len(value)} suggestions]")
+            logger.info(f"{key}: [{len(value)} suggestions]")
             for i, s in enumerate(value, 1):
-                print(f"    {i}. {clean(s)}")
+                logger.debug(f"  {i}. {clean(s)}")
         elif key == "alignment_analysis":
             a = value
             matched = [m.skill for m in a.matched_skills] if hasattr(a, 'matched_skills') else [m["skill"] for m in a["matched_skills"]]
             missing = a.missing_skills if hasattr(a, 'missing_skills') else a["missing_skills"]
-            print(f"  {key}:")
-            print(f"    matched: {matched}")
-            print(f"    missing: {missing}")
+            logger.info(f"{key}: matched={matched}, missing={missing}")
         elif key == "job_profile":
             title = value.title if hasattr(value, 'title') else value["title"]
             skills = value.required_skills if hasattr(value, 'required_skills') else value["required_skills"]
-            print(f"  {key}: {title} ({len(skills)} required skills)")
+            logger.info(f"{key}: {title} ({len(skills)} required skills)")
         elif key == "scorer_output":
-            print(f"\n  Overall Score: {value.overall_score}/100\n")
+            logger.info(f"Overall Score: {value.overall_score}/100")
             for d in value.dimensions:
                 bar = "█" * int(d.score // 5) + "░" * (20 - int(d.score // 5))
-                print(f"  {d.dimension:<22} {bar} {d.score:5.1f}  (w={d.weight:.0%})")
-                print(f"  {'':22} {clean(d.reasoning)}\n")
-            print(f"  Summary: {clean(value.summary)}")
+                logger.info(f"  {d.dimension:<22} {bar} {d.score:5.1f}  (w={d.weight:.0%})")
+                logger.debug(f"  {'':22} {clean(d.reasoning)}")
+            logger.info(f"Summary: {clean(value.summary)}")
         else:
-            print(f"  {key}: {value}")
+            logger.debug(f"{key}: {value}")
 
 
 if __name__ == "__main__":
     from graph import app
 
+    trace_id = str(uuid.uuid4())
     initial_state = {
         "job_description": sample_job,
         "cv_text": sample_cv,
+        "trace_id": trace_id,
     }
 
-    print("Running LangGraph pipeline...")
-    print("supervisor -> analyzer -> supervisor -> writer -> supervisor -> scorer -> END")
+    logger.info("Running LangGraph pipeline", extra={"event_data": {
+        "event": "pipeline_start",
+        "trace_id": trace_id,
+    }})
+    logger.info("supervisor -> analyzer -> supervisor -> writer -> supervisor -> scorer -> END")
 
     for event in app.stream(initial_state, stream_mode="updates"):
         for node_name, updates in event.items():

@@ -25,3 +25,4 @@ class ApplicationState(BaseModel):
     # --- Control ---
     current_agent: str = "analyzer"
     is_complete: bool = False
+    trace_id: str = "" 

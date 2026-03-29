@@ -1,7 +1,12 @@
+import logging
+import time
+
 from extraction import extract_job_profile
 from chunking import chunk_cv
 from rag import store_cv_chunks
 from analysis import analyze_alignment, classify_skills
+
+logger = logging.getLogger("applycheck.analyzer")
 
 
 def _validate_job_profile(job_profile) -> None:
@@ -20,6 +25,15 @@ def _validate_cv_text(cv_text: str) -> None:
 
 
 def analyzer_node(state) -> dict:
+    trace_id = state.trace_id
+    start = time.perf_counter()
+
+    logger.info("Analyzer started", extra={"event_data": {
+        "event": "agent_start",
+        "agent": "analyzer",
+        "trace_id": trace_id,
+    }})
+
     job_description = state.job_description
     cv_text = state.cv_text
 
@@ -40,6 +54,17 @@ def analyzer_node(state) -> dict:
         chunks_stored=chunks_stored,
         skill_types=skill_types,
     )
+
+    elapsed_ms = (time.perf_counter() - start) * 1000
+
+    logger.info("Analyzer complete", extra={"event_data": {
+        "event": "agent_complete",
+        "agent": "analyzer",
+        "trace_id": trace_id,
+        "matched_count": len(alignment.matched_skills),
+        "missing_count": len(alignment.missing_skills),
+        "latency_ms": round(elapsed_ms, 2),
+    }})
 
     return {
         "job_profile": job_profile,

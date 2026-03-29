@@ -1,27 +1,5 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-
-
-sample_cv = """
-Name: Sarah Chen
-
-Summary:
-Experienced software engineer with 4 years of backend development, specializing in Python and cloud infrastructure.
-
-Skills:
-Python, Django, REST APIs, PostgreSQL, Docker, AWS, Git, Linux
-
-Experience:
-- Software Engineer at TechCorp (2021 - Present)
-  Built and maintained microservices using Python and Django. Deployed services on AWS using Docker.
-
-- Junior Developer at StartupXYZ (2020 - 2021)
-  Developed internal REST APIs and managed PostgreSQL databases.
-
-Education:
-- B.Sc. Computer Science, University of Cityville, 2020
-"""
-
 SECTION_HEADERS = {
     # Identity / intro
     "name", "contact", "contact information", "personal information", "personal details",
