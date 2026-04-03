@@ -39,9 +39,34 @@ class ScoreResponse(BaseModel):
     summary: str
 
 
+class JobProfileResponse(BaseModel):
+    title: str
+    required_skills: list[str]
+    preferred_skills: list[str]
+    experience_level: str
+    responsibilities: list[str]
+
+
 class AnalyzeResponse(BaseModel):
     job_title: str
+    job_profile: JobProfileResponse
     analysis: AnalysisResponse
     cv_suggestions: list[str]
     cover_letter: str
     score: ScoreResponse
+    trace_id: str
+
+
+# --- Rescore ---
+
+class DisputedSkill(BaseModel):
+    skill: str
+    category: str  # "required" or "preferred"
+
+
+class RescoreRequest(BaseModel):
+    trace_id: str
+    job_profile: JobProfileResponse
+    analysis: AnalysisResponse
+    cover_letter: str
+    disputed_skills: list[DisputedSkill]

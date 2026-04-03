@@ -5,3 +5,6 @@ __pycache__/
 tests/
 .venv/
 .claude/
+frontend/node_modules/
+frontend/dist/
+static/

@@ -5,6 +5,7 @@ from api.schemas import (
     SkillMatchResponse,
     ScoreResponse,
     DimensionScoreResponse,
+    JobProfileResponse,
 )
 
 
@@ -15,6 +16,13 @@ def build_response(state: dict) -> AnalyzeResponse:
 
     return AnalyzeResponse(
         job_title=job_profile.title,
+        job_profile=JobProfileResponse(
+            title=job_profile.title,
+            required_skills=job_profile.required_skills,
+            preferred_skills=job_profile.preferred_skills,
+            experience_level=job_profile.experience_level,
+            responsibilities=job_profile.responsibilities,
+        ),
         analysis=AnalysisResponse(
             matched_skills=[
                 SkillMatchResponse(
@@ -51,6 +59,7 @@ def build_response(state: dict) -> AnalyzeResponse:
             overall_score=scorer_output.overall_score,
             summary=scorer_output.summary,
         ),
+        trace_id=state.get("trace_id", ""),
     )
 
 

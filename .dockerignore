@@ -3,12 +3,14 @@ __pycache__
 .env
 .git
 .gitignore
+.claude/
 venv/
 .venv/
 *.egg-info
 monitoring/
 docker-compose*.yml
-Dockerfile
 README.md
 tests/
-streamlit_app.py
+frontend/node_modules
+frontend/dist
+static/

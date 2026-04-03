@@ -36,6 +36,28 @@ def _format_analysis(analysis: AlignmentAnalysis) -> str:
     return "\n".join(lines)
 
 
+def rewrite(job_profile, analysis, cv_text) -> dict:
+    """Standalone rewrite — used by /rescore when user disputes missing skills."""
+    prompt = WRITER_PROMPT.format(
+        title=job_profile.title,
+        responsibilities="\n".join(f"- {r}" for r in job_profile.responsibilities),
+        analysis=_format_analysis(analysis),
+        overall_fit=analysis.overall_fit,
+        cv_text=cv_text,
+    )
+    raw = tracked_llm_call(
+        agent="writer",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7,
+    )
+    clean = raw.strip().strip("```json").strip("```").strip()
+    parsed = json.loads(clean, strict=False)
+    return {
+        "cv_suggestions": parsed["cv_suggestions"],
+        "cover_letter": parsed["cover_letter"],
+    }
+
+
 def writer_node(state) -> dict:
     trace_id = state.trace_id
     start = time.perf_counter()
