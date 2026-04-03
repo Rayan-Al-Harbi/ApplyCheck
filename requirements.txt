@@ -1,0 +1,15 @@
+groq
+pydantic
+langchain-text-splitters
+qdrant-client
+sentence-transformers
+python-dotenv
+langgraph
+langsmith
+fastapi
+uvicorn
+prometheus-client
+python-multipart
+PyMuPDF
+python-docx
+streamlit

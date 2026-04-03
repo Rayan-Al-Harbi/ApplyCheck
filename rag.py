@@ -1,10 +1,20 @@
+import os
+
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 
 from sentence_transformers import SentenceTransformer
 
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-qdrant = QdrantClient(":memory:")  # in-memory for development
+
+QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
+QDRANT_PORT = int(os.getenv("QDRANT_PORT", "6333"))
+USE_MEMORY = os.getenv("QDRANT_MEMORY", "false").lower() == "true"
+
+if USE_MEMORY:
+    qdrant = QdrantClient(":memory:")
+else:
+    qdrant = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
 
 COLLECTION_NAME = "cv_chunks"
 EMBEDDING_DIM = 384    

@@ -4,6 +4,9 @@ warnings.filterwarnings("ignore", message=".*Accessing.*__path__.*")
 import logging
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
+import os
+os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+
 import streamlit as st
 from dotenv import load_dotenv
 
