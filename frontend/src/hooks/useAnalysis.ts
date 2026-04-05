@@ -40,6 +40,14 @@ export function useAnalysis() {
     }
   }, []);
 
+  const setExternalResult = useCallback((result: AnalyzeResponse) => {
+    setState((s) => ({
+      ...s,
+      result,
+      disputedSkills: new Set(),
+    }));
+  }, []);
+
   const toggleDispute = useCallback((skill: string) => {
     setState((s) => {
       const next = new Set(s.disputedSkills);
@@ -100,6 +108,7 @@ export function useAnalysis() {
   return {
     ...state,
     submit,
+    setExternalResult,
     toggleDispute,
     submitDispute,
     reset,

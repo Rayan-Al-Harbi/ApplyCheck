@@ -1,23 +1,35 @@
-import UploadForm from "./components/upload/UploadForm";
-import AnalysisProgress from "./components/loading/AnalysisProgress";
-import ResultsDashboard from "./components/results/ResultsDashboard";
-import { useAnalysis } from "./hooks/useAnalysis";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { useDarkMode } from "./hooks/useDarkMode";
 
-export default function App() {
-  const {
-    phase,
-    result,
-    error,
-    isRescoring,
-    disputedSkills,
-    submit,
-    toggleDispute,
-    submitDispute,
-    reset,
-  } = useAnalysis();
+// Pages
+import AuthPage from "./components/auth/AuthPage";
+import Dashboard from "./components/dashboard/Dashboard";
+import AnalyzePage from "./components/analyze/AnalyzePage";
+import HistoryPage from "./components/history/HistoryPage";
+import AnalysisDetailPage from "./components/history/AnalysisDetailPage";
+import GuestPage from "./components/guest/GuestPage";
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-32">
+        <svg className="w-6 h-6 text-primary animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+      </div>
+    );
+  }
+
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
+}
+
+function AppRoutes() {
   const { dark, toggle } = useDarkMode();
+  const { isAuthenticated, isLoading } = useAuth();
 
   return (
     <>
@@ -29,7 +41,7 @@ export default function App() {
       </div>
 
       <div className="min-h-screen relative">
-        {/* Floating dark mode toggle */}
+        {/* Dark mode toggle */}
         <button
           onClick={toggle}
           className="fixed top-5 right-5 z-50 w-10 h-10 rounded-full glass-card flex items-center justify-center
@@ -48,40 +60,38 @@ export default function App() {
         </button>
 
         <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
-          {phase === "input" && <UploadForm onSubmit={submit} />}
+          <Routes>
+            {/* Guest (unauthenticated) flow */}
+            <Route path="/" element={
+              !isLoading && isAuthenticated ? <Navigate to="/dashboard" replace /> : <GuestPage />
+            } />
 
-          {phase === "loading" && <AnalysisProgress />}
+            {/* Auth */}
+            <Route path="/login" element={
+              !isLoading && isAuthenticated ? <Navigate to="/dashboard" replace /> : <AuthPage />
+            } />
 
-          {phase === "results" && result && (
-            <ResultsDashboard
-              result={result}
-              disputedSkills={disputedSkills}
-              isRescoring={isRescoring}
-              onToggleDispute={toggleDispute}
-              onSubmitDispute={submitDispute}
-              onStartOver={reset}
-            />
-          )}
+            {/* Protected */}
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/analyze" element={<ProtectedRoute><AnalyzePage /></ProtectedRoute>} />
+            <Route path="/history" element={<ProtectedRoute><HistoryPage /></ProtectedRoute>} />
+            <Route path="/history/:id" element={<ProtectedRoute><AnalysisDetailPage /></ProtectedRoute>} />
 
-          {phase === "error" && (
-            <div className="max-w-md mx-auto text-center py-16 animate-fade-up">
-              <div className="w-16 h-16 rounded-2xl bg-danger/10 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-danger" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                </svg>
-              </div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Analysis Failed</h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{error}</p>
-              <button
-                onClick={reset}
-                className="px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-dark transition-colors"
-              >
-                Try Again
-              </button>
-            </div>
-          )}
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </main>
       </div>
     </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }

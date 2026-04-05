@@ -3,7 +3,6 @@ load_dotenv()
 
 import logging
 import os
-import re
 import time
 import uuid
 from pathlib import Path
@@ -20,24 +19,14 @@ from model import AlignmentAnalysis, JobProfile, SkillMatch
 from agents.scorer import rescore
 from agents.writer import rewrite
 from logging_config import setup_logging
+from api.auth import router as auth_router
+from api.cv import router as cv_router
+from api.analysis import router as analysis_router
+from api.errors import friendly_error
 
 setup_logging()
 logger = logging.getLogger("applycheck.api")
 
-
-def _friendly_error(e: Exception) -> tuple[int, str]:
-    """Map known exceptions to user-friendly messages. Returns (status_code, message)."""
-    msg = str(e)
-    if "rate_limit" in msg or "429" in msg:
-        # Extract wait time if present
-        match = re.search(r"try again in ([^.]+\.\d+s)", msg, re.IGNORECASE)
-        wait = f" Please wait {match.group(1)} and try again." if match else " Please wait a moment and try again."
-        return 429, f"The AI service is temporarily busy.{wait}"
-    if "401" in msg or "auth" in msg.lower():
-        return 502, "AI service authentication error. Please contact support."
-    if "timeout" in msg.lower() or "timed out" in msg.lower():
-        return 504, "The analysis took too long. Please try again with a shorter job description or CV."
-    return 500, "Something went wrong during analysis. Please try again."
 
 # Simple in-memory cache for cv_text by trace_id (needed for rescore/rewrite)
 _cv_text_cache: dict[str, str] = {}
@@ -54,6 +43,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth_router)
+app.include_router(cv_router)
+app.include_router(analysis_router)
 
 
 @app.get("/health")
@@ -102,7 +95,7 @@ def analyze_application(request: AnalyzeRequest):
             "trace_id": trace_id,
             "error": str(e),
         }})
-        status, msg = _friendly_error(e)
+        status, msg = friendly_error(e)
         raise HTTPException(status_code=status, detail=msg)
     finally:
         REQUEST_LATENCY.labels(endpoint="/analyze").observe(time.perf_counter() - start)
@@ -154,7 +147,7 @@ async def analyze_with_upload(
         raise
     except Exception as e:
         REQUEST_COUNT.labels(endpoint="/analyze/upload", status="error").inc()
-        status, msg = _friendly_error(e)
+        status, msg = friendly_error(e)
         raise HTTPException(status_code=status, detail=msg)
     finally:
         REQUEST_LATENCY.labels(endpoint="/analyze/upload").observe(time.perf_counter() - start)
@@ -267,7 +260,7 @@ def rescore_application(request: RescoreRequest):
             "endpoint": "/rescore",
             "error": str(e),
         }})
-        status, msg = _friendly_error(e)
+        status, msg = friendly_error(e)
         raise HTTPException(status_code=status, detail=msg)
     finally:
         REQUEST_LATENCY.labels(endpoint="/rescore").observe(time.perf_counter() - start)

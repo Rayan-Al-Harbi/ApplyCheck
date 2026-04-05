@@ -6,4 +6,5 @@ scrape_configs:
   - job_name: "applycheck"
     metrics_path: /metrics
     static_configs:
-      - targets: ["app:8000"]
+      - targets: ["applycheck-production.up.railway.app"]
+    scheme: https

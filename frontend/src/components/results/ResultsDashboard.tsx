@@ -52,13 +52,22 @@ export default function ResultsDashboard({
           <p className="text-xs font-semibold text-primary dark:text-indigo-300 uppercase tracking-widest mb-1">Results</p>
           <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white tracking-tight">{result.job_title}</h2>
         </div>
-        <button
-          onClick={onStartOver}
-          className="px-4 py-2 rounded-xl text-sm font-semibold transition-all
-                     text-gray-600 dark:text-gray-300 glass-card hover:scale-105"
-        >
-          Start Over
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => window.location.href = "/dashboard"}
+            className="px-4 py-2 rounded-xl text-sm font-semibold transition-all
+                       text-gray-600 dark:text-gray-300 glass-card hover:scale-105"
+          >
+            Back to Home
+          </button>
+          <button
+            onClick={onStartOver}
+            className="px-4 py-2 rounded-xl text-sm font-semibold transition-all
+                       text-primary glass-card hover:scale-105"
+          >
+            New Analysis
+          </button>
+        </div>
       </div>
 
       {/* Score + Skills side by side */}

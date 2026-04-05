@@ -12,4 +12,8 @@ prometheus-client
 python-multipart
 PyMuPDF
 python-docx
-
+sqlalchemy
+alembic
+psycopg2-binary
+python-jose[cryptography]
+bcrypt
