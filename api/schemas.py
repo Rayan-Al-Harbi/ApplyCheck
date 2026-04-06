@@ -71,3 +71,4 @@ class RescoreRequest(BaseModel):
     cover_letter: str
     disputed_skills: list[DisputedSkill]
     cv_suggestions: list[str] = []
+    original_score: ScoreResponse | None = None

@@ -80,6 +80,7 @@ export function useAnalysis() {
         cover_letter: result.cover_letter,
         disputed_skills: disputed,
         cv_suggestions: result.cv_suggestions,
+        original_score: result.score,
       });
       setState((s) => ({
         ...s,

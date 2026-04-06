@@ -173,6 +173,7 @@ def rescore_application(request: RescoreRequest):
 
         # Build matched/missing lists, applying disputes
         disputed_names = {d.skill for d in request.disputed_skills}
+        dispute_evidence = "Candidate has verified proficiency in this skill. Treat as fully demonstrated — do not penalize or question this skill in any dimension."
 
         matched_skills = [
             SkillMatch(skill=s.skill, matched=True, evidence=s.evidence)
@@ -181,7 +182,7 @@ def rescore_application(request: RescoreRequest):
         missing_skills = []
         for skill in request.analysis.missing_skills:
             if skill in disputed_names:
-                matched_skills.append(SkillMatch(skill=skill, matched=True, evidence="Confirmed by candidate"))
+                matched_skills.append(SkillMatch(skill=skill, matched=True, evidence=dispute_evidence))
             else:
                 missing_skills.append(skill)
 
@@ -192,16 +193,25 @@ def rescore_application(request: RescoreRequest):
         missing_preferred = []
         for skill in request.analysis.missing_preferred:
             if skill in disputed_names:
-                matched_preferred.append(SkillMatch(skill=skill, matched=True, evidence="Confirmed by candidate"))
+                matched_preferred.append(SkillMatch(skill=skill, matched=True, evidence=dispute_evidence))
             else:
                 missing_preferred.append(skill)
+
+        # Update overall_fit to reflect the dispute
+        disputed_list = ", ".join(sorted(disputed_names))
+        updated_fit = (
+            f"{request.analysis.overall_fit}\n\n"
+            f"UPDATE: The candidate has confirmed proficiency in the following skills: {disputed_list}. "
+            f"These skills are now verified and should be treated as fully matched — "
+            f"do not treat them as gaps or weaknesses in any dimension."
+        )
 
         analysis = AlignmentAnalysis(
             matched_skills=matched_skills,
             missing_skills=missing_skills,
             matched_preferred=matched_preferred,
             missing_preferred=missing_preferred,
-            overall_fit=request.analysis.overall_fit,
+            overall_fit=updated_fit,
         )
 
         # Re-run writer if we have cached cv_text, otherwise keep original cover letter
@@ -216,6 +226,20 @@ def rescore_application(request: RescoreRequest):
 
         # Rescore
         scorer_output = rescore(jp, analysis, cover_letter)
+
+        # Apply score floor: disputing skills should never lower any dimension
+        if request.original_score:
+            original_by_dim = {
+                d.dimension: d.score for d in request.original_score.dimensions
+            }
+            for dim in scorer_output.dimensions:
+                original = original_by_dim.get(dim.dimension)
+                if original is not None and dim.score < original:
+                    dim.score = original
+            # Recalculate weighted average after floor
+            scorer_output.overall_score = round(
+                sum(d.score * d.weight for d in scorer_output.dimensions), 1
+            )
 
         from api.schemas import (
             AnalysisResponse, SkillMatchResponse, ScoreResponse,
