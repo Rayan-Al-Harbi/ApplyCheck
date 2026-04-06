@@ -33,8 +33,15 @@ from db import models as _db_models  # noqa: F401 — ensure models are register
 Base.metadata.create_all(bind=engine)
 
 
-# Simple in-memory cache for cv_text by trace_id (needed for rescore/rewrite)
-_cv_text_cache: dict[str, str] = {}
+# Bounded in-memory cache for cv_text by trace_id (needed for rescore/rewrite)
+from collections import OrderedDict
+_cv_text_cache: OrderedDict[str, str] = OrderedDict()
+_CV_CACHE_MAX = 200
+
+def _cache_cv_text(trace_id: str, cv_text: str):
+    _cache_cv_text(trace_id, cv_text)
+    while len(_cv_text_cache) > _CV_CACHE_MAX:
+        _cv_text_cache.popitem(last=False)
 
 app = FastAPI(
     title="Job Application Intelligence",
@@ -82,7 +89,7 @@ def analyze_application(request: AnalyzeRequest):
         }
 
         final_state = app_graph.invoke(initial_state)
-        _cv_text_cache[trace_id] = request.cv_text
+        _cache_cv_text(trace_id, request.cv_text)
 
         logger.info("Request complete", extra={"event_data": {
             "event": "request_complete",
@@ -137,7 +144,7 @@ async def analyze_with_upload(
         }
 
         final_state = app_graph.invoke(initial_state)
-        _cv_text_cache[trace_id] = cv_text
+        _cache_cv_text(trace_id, cv_text)
 
         logger.info("Upload request complete", extra={"event_data": {
             "event": "request_complete",

@@ -3,7 +3,7 @@ import time
 
 from extraction import extract_job_profile
 from chunking import chunk_cv
-from rag import store_cv_chunks
+from rag import store_cv_chunks, cleanup_collection
 from analysis import analyze_alignment, classify_skills
 from api.metrics import AGENT_LATENCY, PIPELINE_ERROR_COUNT
 
@@ -43,10 +43,10 @@ def analyzer_node(state) -> dict:
         job_profile = extract_job_profile(job_description)
         _validate_job_profile(job_profile)
 
-        # Phase 2: chunk CV and store in vector DB
+        # Phase 2: chunk CV and store in per-request vector collection
         _validate_cv_text(cv_text)
         chunks = chunk_cv(cv_text)
-        store_cv_chunks(chunks)
+        store_cv_chunks(chunks, trace_id)
         chunks_stored = len(chunks) > 0
 
         # Phase 3: classify skills and run alignment analysis
@@ -55,7 +55,11 @@ def analyzer_node(state) -> dict:
             job_profile, cv_text,
             chunks_stored=chunks_stored,
             skill_types=skill_types,
+            trace_id=trace_id,
         )
+
+        # Clean up per-request vector collection
+        cleanup_collection(trace_id)
 
         elapsed_ms = (time.perf_counter() - start) * 1000
 
@@ -74,6 +78,8 @@ def analyzer_node(state) -> dict:
             "current_agent": "writer",
         }
     except Exception:
+        # Best-effort cleanup on error too
+        cleanup_collection(trace_id)
         PIPELINE_ERROR_COUNT.labels(agent="analyzer").inc()
         raise
     finally:

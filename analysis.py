@@ -4,7 +4,7 @@ import time
 from langsmith import traceable
 from model import JobProfile, SkillMatch, AlignmentAnalysis, SkillType, SkillClassifierOutput
 from prompt import SKILL_EVAL_PROMPT, SKILL_CLASSIFIER_PROMPT, HARD_SKILL_EVAL_RULES, SOFT_SKILL_EVAL_RULES, LANGUAGE_EVAL_RULES
-from rag import retrieve_relevant_chunks, get_cv_context, precompute_skill_embeddings
+from rag import get_cv_context, precompute_skill_embeddings
 from utils import parse_llm_json, tracked_llm_call
 
 logger = logging.getLogger("applycheck.analysis")
@@ -65,7 +65,7 @@ def evaluate_skill_match(skill: str, context: str, skill_type: SkillType = Skill
     return result
 
 
-def analyze_alignment(job_profile: JobProfile, cv_text: str, chunks_stored: bool = True, skill_types: dict[str, SkillType] | None = None) -> AlignmentAnalysis:
+def analyze_alignment(job_profile: JobProfile, cv_text: str, chunks_stored: bool = True, skill_types: dict[str, SkillType] | None = None, trace_id: str = "") -> AlignmentAnalysis:
     matched = []
     missing = []
 
@@ -77,7 +77,7 @@ def analyze_alignment(job_profile: JobProfile, cv_text: str, chunks_stored: bool
     precompute_skill_embeddings(all_skills)
 
     for skill in job_profile.required_skills:
-        context = get_cv_context(cv_text, skill, chunks_stored)
+        context = get_cv_context(cv_text, skill, chunks_stored, trace_id)
         skill_type = skill_types.get(skill, SkillType.HARD)
 
         result = evaluate_skill_match(skill, context, skill_type)
@@ -91,7 +91,7 @@ def analyze_alignment(job_profile: JobProfile, cv_text: str, chunks_stored: bool
     missing_preferred = []
 
     for skill in job_profile.preferred_skills:
-        context = get_cv_context(cv_text, skill, chunks_stored)
+        context = get_cv_context(cv_text, skill, chunks_stored, trace_id)
         skill_type = skill_types.get(skill, SkillType.HARD)
 
         result = evaluate_skill_match(skill, context, skill_type)
