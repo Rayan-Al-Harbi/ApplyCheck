@@ -79,6 +79,7 @@ export function useAnalysis() {
         analysis: result.analysis,
         cover_letter: result.cover_letter,
         disputed_skills: disputed,
+        cv_suggestions: result.cv_suggestions,
       });
       setState((s) => ({
         ...s,

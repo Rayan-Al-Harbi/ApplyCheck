@@ -4,6 +4,7 @@ import { useDarkMode } from "./hooks/useDarkMode";
 
 // Pages
 import AuthPage from "./components/auth/AuthPage";
+import OAuthCallback from "./components/auth/OAuthCallback";
 import Dashboard from "./components/dashboard/Dashboard";
 import AnalyzePage from "./components/analyze/AnalyzePage";
 import HistoryPage from "./components/history/HistoryPage";
@@ -70,6 +71,8 @@ function AppRoutes() {
             <Route path="/login" element={
               !isLoading && isAuthenticated ? <Navigate to="/dashboard" replace /> : <AuthPage />
             } />
+            <Route path="/auth/google/callback" element={<OAuthCallback provider="google" />} />
+            <Route path="/auth/linkedin/callback" element={<OAuthCallback provider="linkedin" />} />
 
             {/* Protected */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

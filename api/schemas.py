@@ -70,3 +70,4 @@ class RescoreRequest(BaseModel):
     analysis: AnalysisResponse
     cover_letter: str
     disputed_skills: list[DisputedSkill]
+    cv_suggestions: list[str] = []

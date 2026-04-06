@@ -54,6 +54,7 @@ export interface RescoreRequest {
   analysis: Analysis;
   cover_letter: string;
   disputed_skills: DisputedSkill[];
+  cv_suggestions: string[];
 }
 
 // --- Auth ---

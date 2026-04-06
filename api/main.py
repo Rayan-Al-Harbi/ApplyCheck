@@ -212,7 +212,7 @@ def rescore_application(request: RescoreRequest):
             cv_suggestions = writer_output["cv_suggestions"]
         else:
             cover_letter = request.cover_letter
-            cv_suggestions = []
+            cv_suggestions = request.cv_suggestions
 
         # Rescore
         scorer_output = rescore(jp, analysis, cover_letter)

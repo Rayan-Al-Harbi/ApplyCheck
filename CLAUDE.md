@@ -76,7 +76,7 @@ Extraction + RAG + alignment analysis pipeline:
 
 22. **`db/config.py`** — SQLAlchemy engine, `SessionLocal` session factory, `get_db` dependency. `DATABASE_URL` from env (default: `postgresql://applycheck:applycheck@localhost:5432/applycheck`).
 
-23. **`db/models.py`** — SQLAlchemy ORM models: `User` (id, email, password_hash, created_at), `CV` (id, user_id UNIQUE, raw_text, profile JSONB, uploaded_at, updated_at), `Analysis` (id, user_id, job_description, job_profile JSONB, alignment JSONB, cv_suggestions JSONB, cover_letter, scorer_output JSONB, cv_changed, created_at). CASCADE deletes. Descending index on `(user_id, created_at)`.
+23. **`db/models.py`** — SQLAlchemy ORM models: `User` (id, email, password_hash nullable, oauth_provider, oauth_id, created_at), `CV` (id, user_id UNIQUE, raw_text, profile JSONB, uploaded_at, updated_at), `Analysis` (id, user_id, job_description, job_profile JSONB, alignment JSONB, cv_suggestions JSONB, cover_letter, scorer_output JSONB, cv_changed, created_at). CASCADE deletes. Descending index on `(user_id, created_at)`.
 
 18. **`api/metrics.py`** — Prometheus metric definitions (all prefixed `applycheck_`). RED counters: `REQUEST_COUNT` (endpoint/status), `LLM_CALL_COUNT` (agent/model), `LLM_ERROR_COUNT` (agent/error_type), `PIPELINE_ERROR_COUNT` (agent). Latency histograms: `REQUEST_LATENCY` (endpoint, 1–120s buckets), `AGENT_LATENCY` (agent, 0.5–30s), `LLM_LATENCY` (agent/model, 0.5–15s). AI-specific histograms: `SCORE_DISTRIBUTION` (10–100), `SKILLS_MATCHED` ratio (0.0–1.0). Imported lazily in `tracked_llm_call` and directly in agent nodes and `api/main.py`.
 
@@ -207,4 +207,10 @@ JWT authentication with bcrypt password hashing, PostgreSQL with SQLAlchemy ORM 
 | `DATABASE_URL` | No | `postgresql://applycheck:applycheck@localhost:5432/applycheck` | PostgreSQL connection string |
 | `JWT_SECRET_KEY` | No | `dev-secret-change-in-production` | Secret key for JWT signing |
 | `JWT_EXPIRATION_DAYS` | No | `7` | JWT token expiration in days |
+| `GOOGLE_CLIENT_ID` | No | — | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | No | — | Google OAuth client secret |
+| `LINKEDIN_CLIENT_ID` | No | — | LinkedIn OAuth client ID |
+| `LINKEDIN_CLIENT_SECRET` | No | — | LinkedIn OAuth client secret |
+| `VITE_GOOGLE_CLIENT_ID` | No | — | Google OAuth client ID (frontend) |
+| `VITE_LINKEDIN_CLIENT_ID` | No | — | LinkedIn OAuth client ID (frontend) |
 | `VITE_API_URL` | No | `""` | Frontend API base URL (for separate deployments) |

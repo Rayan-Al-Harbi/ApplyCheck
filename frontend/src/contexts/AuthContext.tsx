@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
-import { login as apiLogin, register as apiRegister } from "../api/client";
+import { login as apiLogin, register as apiRegister, googleAuth, linkedinAuth } from "../api/client";
 
 interface AuthState {
   token: string | null;
@@ -10,6 +10,8 @@ interface AuthState {
 interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (code: string, redirectUri: string) => Promise<void>;
+  loginWithLinkedin: (code: string, redirectUri: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -44,13 +46,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState({ token: res.access_token, isAuthenticated: true, isLoading: false });
   }, []);
 
+  const loginWithGoogle = useCallback(async (code: string, redirectUri: string) => {
+    const res = await googleAuth(code, redirectUri);
+    localStorage.setItem("token", res.access_token);
+    setState({ token: res.access_token, isAuthenticated: true, isLoading: false });
+  }, []);
+
+  const loginWithLinkedin = useCallback(async (code: string, redirectUri: string) => {
+    const res = await linkedinAuth(code, redirectUri);
+    localStorage.setItem("token", res.access_token);
+    setState({ token: res.access_token, isAuthenticated: true, isLoading: false });
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem("token");
     setState({ token: null, isAuthenticated: false, isLoading: false });
   }, []);
 
   return (
-    <AuthContext.Provider value={{ ...state, login, register, logout }}>
+    <AuthContext.Provider value={{ ...state, login, register, loginWithGoogle, loginWithLinkedin, logout }}>
       {children}
     </AuthContext.Provider>
   );

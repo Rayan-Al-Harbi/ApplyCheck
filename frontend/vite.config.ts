@@ -6,7 +6,10 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      '/auth': 'http://localhost:8000',
+      '/auth/register': 'http://localhost:8000',
+      '/auth/login': 'http://localhost:8000',
+      '/auth/google': 'http://localhost:8000',
+      '/auth/linkedin': 'http://localhost:8000',
       '/cv': 'http://localhost:8000',
       '/analyze': 'http://localhost:8000',
       '/analyses': 'http://localhost:8000',

@@ -43,6 +43,26 @@ export async function login(email: string, password: string): Promise<AuthRespon
   return handleResponse<AuthResponse>(res);
 }
 
+// --- OAuth ---
+
+export async function googleAuth(code: string, redirectUri: string): Promise<AuthResponse> {
+  const res = await fetch(`${BASE_URL}/auth/google`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code, redirect_uri: redirectUri }),
+  });
+  return handleResponse<AuthResponse>(res);
+}
+
+export async function linkedinAuth(code: string, redirectUri: string): Promise<AuthResponse> {
+  const res = await fetch(`${BASE_URL}/auth/linkedin`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code, redirect_uri: redirectUri }),
+  });
+  return handleResponse<AuthResponse>(res);
+}
+
 // --- CV ---
 
 export async function uploadCV(cvFile: File): Promise<CVUploadResponse> {
