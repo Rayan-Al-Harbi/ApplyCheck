@@ -170,8 +170,8 @@ def list_analyses(
     for r in records:
         job_profile = r.job_profile
         alignment = r.alignment
-        matched_count = len(alignment.get("matched_skills", []))
-        missing_count = len(alignment.get("missing_skills", []))
+        matched_count = len(alignment.get("matched_skills", [])) + len(alignment.get("matched_preferred", []))
+        missing_count = len(alignment.get("missing_skills", [])) + len(alignment.get("missing_preferred", []))
 
         summaries.append(AnalysisSummary(
             id=str(r.id),

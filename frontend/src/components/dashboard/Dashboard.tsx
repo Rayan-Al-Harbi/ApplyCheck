@@ -183,7 +183,7 @@ export default function Dashboard() {
           </div>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 flex-1">
             {cv
-              ? "Your CV is ready. Start a new job analysis with just a job description."
+              ? "Your CV is ready. Start a new analysis with just a job description."
               : "Upload your CV first, then analyze job descriptions instantly."}
           </p>
           <button
