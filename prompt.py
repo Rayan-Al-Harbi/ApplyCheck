@@ -151,7 +151,7 @@ Rules:
 - For matched skills with weak evidence: suggest how to strengthen the phrasing by referencing the specific experience from the evidence field above.
 - CRITICAL: Never fabricate or embellish. Every claim, metric, achievement, and detail in the cover letter must be directly traceable to the CV text above. Do not invent percentages, processes, tools, or outcomes that the CV does not explicitly state.
 - NEVER suggest trivial rephrasing like renaming "Python" to "Python development" or adding adjectives to existing skills. Only suggest substantive changes: adding missing quantifiable achievements, restructuring sections, highlighting overlooked projects, or adding context that demonstrates impact.
-- The cover letter must be professional, 3-4 paragraphs, and directly connect the candidate's strengths to the job requirements.
+- The cover letter must be professional, 3-4 paragraphs, and directly connect the candidate's strengths to the job requirements. Separate each paragraph with a blank line (use \\n\\n in the JSON string).
 - CRITICAL: The alignment analysis above is the single source of truth. Every skill under MATCHED is a confirmed, verified strength — present it confidently. The ONLY gaps are skills explicitly listed under MISSING. Never mention, imply, or hedge about any matched skill being weak or underdeveloped.
 - If there are no skills under MISSING, do not mention any gaps or areas of growth at all.
 - Do not use generic filler language. Every sentence should be specific to this candidate and role.
