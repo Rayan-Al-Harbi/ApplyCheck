@@ -39,12 +39,18 @@ _RULES_BY_TYPE = {
 }
 
 
+def _core_skill(skill: str) -> str:
+    """Strip parenthetical qualifiers so the LLM evaluates the core competency."""
+    return skill.split("(")[0].strip() if "(" in skill else skill
+
+
 @traceable(name="skill_evaluation", metadata={"component": "analyzer"})
 def evaluate_skill_match(skill: str, context: str, skill_type: SkillType = SkillType.HARD) -> SkillMatch:
     start = time.perf_counter()
 
+    eval_skill = _core_skill(skill)
     rules = _RULES_BY_TYPE.get(skill_type, HARD_SKILL_EVAL_RULES)
-    prompt = SKILL_EVAL_PROMPT.format(skill=skill, context=context, rules=rules)
+    prompt = SKILL_EVAL_PROMPT.format(skill=eval_skill, context=context, rules=rules)
 
     raw = tracked_llm_call(
         agent="analyzer",
@@ -52,6 +58,8 @@ def evaluate_skill_match(skill: str, context: str, skill_type: SkillType = Skill
     )
 
     result = parse_llm_json(raw, SkillMatch, agent="analyzer")
+    # Restore the full skill name for display
+    result.skill = skill
 
     logger.info("Skill evaluated", extra={"event_data": {
         "event": "llm_call",
