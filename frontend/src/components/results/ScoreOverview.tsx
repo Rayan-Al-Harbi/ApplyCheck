@@ -53,7 +53,7 @@ export default function ScoreOverview({ score, previousScore }: Props) {
             {previousScore != null && previousScore !== score.overall_score && (
               <span className="text-xs text-disputed font-semibold">
                 {score.overall_score > previousScore ? "+" : ""}
-                {Math.round(score.overall_score - previousScore)} from dispute
+                {Math.round(score.overall_score - previousScore)} from previous
               </span>
             )}
           </div>

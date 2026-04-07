@@ -10,6 +10,7 @@ load_dotenv(override=True)
 client = Groq(api_key=os.environ["GROQ_API_KEY"])
 
 MODEL = "openai/gpt-oss-120b"
+WRITER_MODEL = "llama-3.3-70b-versatile"
 
 
 def tracked_llm_call(

@@ -4,7 +4,7 @@ import time
 
 from model import AlignmentAnalysis
 from prompt import WRITER_PROMPT
-from utils import tracked_llm_call
+from utils import tracked_llm_call, WRITER_MODEL
 from api.metrics import AGENT_LATENCY, PIPELINE_ERROR_COUNT
 
 logger = logging.getLogger("applycheck.writer")
@@ -48,6 +48,7 @@ def rewrite(job_profile, analysis, cv_text) -> dict:
         agent="writer",
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
+        model=WRITER_MODEL,
     )
     clean = raw.strip().strip("```json").strip("```").strip()
     parsed = json.loads(clean, strict=False)

@@ -8,13 +8,13 @@ ApplyCheck takes a CV and a job posting, then runs them through a pipeline of sp
 
 **Key features:**
 - Skill-by-skill alignment with evidence from CV content
-- Separate evaluation rules for hard skills, soft skills, and languages
+- Separate evaluation rules for hard skills, soft skills
 - Cover letter generation tailored to matched strengths
 - Actionable CV improvement suggestions
 - Skill dispute flow — users can verify skills the AI missed, triggering a rescore
 - Experience level gap detection in scoring
 - JWT authentication with persistent CV storage and analysis history
-- Real-time SSE streaming showing agent progress
+-
 
 ## Architecture
 
@@ -39,19 +39,19 @@ ApplyCheck takes a CV and a job posting, then runs them through a pipeline of sp
 **Supervisor** orchestrates three subagents via LangGraph:
 - **Analyzer** — Extracts job profile, chunks and embeds CV into Qdrant, classifies skills by type, evaluates each skill with type-specific rules, returns alignment analysis
 - **Writer** — Generates CV suggestions and a tailored cover letter grounded in matched skill evidence
-- **Scorer** — Scores across three weighted dimensions (Skill Match 35%, Experience Relevance 35%, Overall Presentation 30%) with experience level gap awareness
+- **Scorer** — Scores across three weighted dimensions (Skill Match, Experience Relevance, Overall Presentation) with experience level gap awareness
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
 | **Orchestration** | LangGraph (multi-agent state graph) |
-| **LLM** | Groq API — llama-3.3-70b-versatile |
+| **LLM** | Groq API — gpt-oss-120b | llama-3.3-70b-versatile (Writer agent)
 | **RAG** | Qdrant + sentence-transformers (all-MiniLM-L6-v2) |
 | **Backend** | FastAPI, SQLAlchemy, PostgreSQL |
 | **Frontend** | React + Vite + TypeScript + Tailwind CSS |
 | **Auth** | JWT + bcrypt |
-| **Monitoring** | Prometheus + Grafana (local) |
+| **Monitoring** | Prometheus + Grafana |
 | **Deployment** | Docker, Railway |
 
 ## Setup & Running
@@ -113,4 +113,5 @@ docker compose up --build  # app + PostgreSQL + Qdrant + Prometheus + Grafana
 
 ## Status
 
-All 12 phases complete — from foundation models through cloud deployment with auth and persistent history.
+This is an active project exploring multi-agent architectures with LangGraph and RAG pipelines.
+
