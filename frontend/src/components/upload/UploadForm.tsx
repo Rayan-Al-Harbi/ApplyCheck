@@ -1,10 +1,12 @@
 import { useState, useRef, type DragEvent } from "react";
+import { Link } from "react-router-dom";
 
 interface Props {
   onSubmit: (jobDescription: string, cvFile: File) => void;
+  signInLink?: boolean;
 }
 
-export default function UploadForm({ onSubmit }: Props) {
+export default function UploadForm({ onSubmit, signInLink }: Props) {
   const [jobDescription, setJobDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -54,6 +56,26 @@ export default function UploadForm({ onSubmit }: Props) {
             fit scoring, and a tailored cover letter.
           </p>
         </div>
+
+        {/* Sign in link */}
+        {signInLink && (
+          <div className="text-center">
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-base font-semibold
+                         bg-primary/10 dark:bg-primary/20 text-primary hover:bg-primary/20 dark:hover:bg-primary/30
+                         hover:scale-105 transition-all"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+              Sign in for a better experience
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </Link>
+          </div>
+        )}
 
         {/* Job Description */}
         <div className="glass-card rounded-2xl p-6 space-y-3">
