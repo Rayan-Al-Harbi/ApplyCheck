@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getAnalysis } from "../../api/client";
 import type { AnalysisDetail } from "../../api/types";
+import { AIDisclaimer } from "../Footer";
 
 export default function AnalysisDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -147,7 +148,7 @@ export default function AnalysisDetailPage() {
                 <span
                   key={s.skill}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold ${
-                    s.evidence === "Confirmed by candidate"
+                    s.evidence === "Demonstrated through professional experience and practical application."
                       ? "bg-disputed/10 text-disputed border border-disputed/20"
                       : "bg-success/10 text-success border border-success/20"
                   }`}
@@ -217,6 +218,7 @@ export default function AnalysisDetailPage() {
           </ol>
         </div>
       )}
+      <AIDisclaimer />
     </div>
   );
 }

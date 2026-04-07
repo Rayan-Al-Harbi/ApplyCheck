@@ -39,7 +39,7 @@ _cv_text_cache: OrderedDict[str, str] = OrderedDict()
 _CV_CACHE_MAX = 200
 
 def _cache_cv_text(trace_id: str, cv_text: str):
-    _cache_cv_text(trace_id, cv_text)
+    _cv_text_cache[trace_id] = cv_text
     while len(_cv_text_cache) > _CV_CACHE_MAX:
         _cv_text_cache.popitem(last=False)
 
@@ -180,7 +180,7 @@ def rescore_application(request: RescoreRequest):
 
         # Build matched/missing lists, applying disputes
         disputed_names = {d.skill for d in request.disputed_skills}
-        dispute_evidence = "Candidate has verified proficiency in this skill. Treat as fully demonstrated — do not penalize or question this skill in any dimension."
+        dispute_evidence = "Demonstrated through professional experience and practical application."
 
         matched_skills = [
             SkillMatch(skill=s.skill, matched=True, evidence=s.evidence)
@@ -243,7 +243,7 @@ def rescore_application(request: RescoreRequest):
             DimensionScoreResponse, JobProfileResponse,
         )
 
-        return AnalyzeResponse(
+        response = AnalyzeResponse(
             job_title=jp.title,
             job_profile=JobProfileResponse(
                 title=jp.title,
@@ -278,7 +278,31 @@ def rescore_application(request: RescoreRequest):
                 summary=scorer_output.summary,
             ),
             trace_id=request.trace_id,
+            analysis_id=request.analysis_id,
         )
+
+        # Update the DB record if this is an authenticated rescore
+        if request.analysis_id:
+            try:
+                from db.config import SessionLocal
+                from db.models import Analysis as AnalysisModel
+                db = SessionLocal()
+                try:
+                    record = db.query(AnalysisModel).filter(
+                        AnalysisModel.id == request.analysis_id
+                    ).first()
+                    if record:
+                        record.alignment = analysis.model_dump()
+                        record.cv_suggestions = cv_suggestions
+                        record.cover_letter = cover_letter
+                        record.scorer_output = scorer_output.model_dump()
+                        db.commit()
+                finally:
+                    db.close()
+            except Exception:
+                logger.warning("Failed to update analysis record after rescore", exc_info=True)
+
+        return response
     except Exception as e:
         logger.error("Rescore failed", extra={"event_data": {
             "event": "request_error",

@@ -5,10 +5,10 @@ export default function Footer() {
         href="https://www.linkedin.com/in/rayan-alharbi-b82s27/"
         target="_blank"
         rel="noopener noreferrer"
-        className="text-[11px] text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-indigo-400 transition-colors tracking-wide"
+        className="text-[10px] text-gray-400 dark:text-gray-500 hover:text-primary dark:hover:text-indigo-400 transition-colors tracking-wide"
         style={{ fontFamily: "'Palatino Linotype', 'Book Antiqua', Palatino, serif" }}
       >
-        By Rayan Alharbi
+        Made by Rayan Alharbi
       </a>
     </div>
   );

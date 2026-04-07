@@ -124,12 +124,15 @@ def analyze_authenticated(
             from db.config import SessionLocal
             save_db = SessionLocal()
             try:
-                _save_analysis(save_db, user_id, accumulated, job_description, cv_changed)
+                record = _save_analysis(save_db, user_id, accumulated, job_description, cv_changed)
+                analysis_id = str(record.id)
             finally:
                 save_db.close()
 
             response_data = build_response(accumulated)
-            yield f"data: {json.dumps({'type': 'result', 'data': response_data.model_dump()})}\n\n"
+            resp = response_data.model_dump()
+            resp["analysis_id"] = analysis_id
+            yield f"data: {json.dumps({'type': 'result', 'data': resp})}\n\n"
 
             REQUEST_COUNT.labels(endpoint="/analyze/auth", status="success").inc()
         except Exception as e:

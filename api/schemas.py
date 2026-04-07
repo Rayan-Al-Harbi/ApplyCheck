@@ -54,6 +54,7 @@ class AnalyzeResponse(BaseModel):
     cover_letter: str
     score: ScoreResponse
     trace_id: str
+    analysis_id: str | None = None
 
 
 # --- Rescore ---
@@ -71,3 +72,4 @@ class RescoreRequest(BaseModel):
     disputed_skills: list[DisputedSkill]
     cv_suggestions: list[str] = []
     original_score: ScoreResponse | None = None
+    analysis_id: str | None = None

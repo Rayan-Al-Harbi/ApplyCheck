@@ -5,6 +5,7 @@ import type { AnalyzeResponse } from "../../api/types";
 import AnalysisProgress from "../loading/AnalysisProgress";
 import ResultsDashboard from "../results/ResultsDashboard";
 import { useAnalysis } from "../../hooks/useAnalysis";
+import { AIDisclaimer } from "../Footer";
 
 type Phase = "input" | "loading" | "results" | "error";
 
@@ -155,6 +156,7 @@ export default function AnalyzePage() {
           Analyze Application
         </button>
       </form>
+      <AIDisclaimer />
     </div>
   );
 }

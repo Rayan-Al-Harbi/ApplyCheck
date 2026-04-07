@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAnalyses } from "../../api/client";
+import { AIDisclaimer } from "../Footer";
 import type { AnalysisSummary } from "../../api/types";
 
 export default function HistoryPage() {
@@ -160,6 +161,7 @@ export default function HistoryPage() {
           )}
         </>
       )}
+      <AIDisclaimer />
     </div>
   );
 }

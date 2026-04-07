@@ -93,7 +93,7 @@ export default function SkillsPanel({ analysis, disputedSkills, onToggleDispute 
 
 function MatchedBadge({ skill, evidence }: { skill: string; evidence: string }) {
   const [showEvidence, setShowEvidence] = useState(false);
-  const isDisputed = evidence === "Confirmed by candidate";
+  const isDisputed = evidence === "Demonstrated through professional experience and practical application.";
 
   return (
     <div className="relative">

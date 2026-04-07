@@ -81,6 +81,7 @@ export function useAnalysis() {
         disputed_skills: disputed,
         cv_suggestions: result.cv_suggestions,
         original_score: result.score,
+        analysis_id: result.analysis_id,
       });
       setState((s) => ({
         ...s,

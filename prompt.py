@@ -146,8 +146,10 @@ Rules:
 - For missing skills: suggest adding them ONLY if the candidate has transferable experience. Do not suggest adding skills the candidate does not have.
 - For matched skills with weak evidence: suggest how to strengthen the phrasing by referencing the specific experience from the evidence field above.
 - Do not invent experience the candidate does not have.
+- NEVER suggest trivial rephrasing like renaming "Python" to "Python development" or adding adjectives to existing skills. Only suggest substantive changes: adding missing quantifiable achievements, restructuring sections, highlighting overlooked projects, or adding context that demonstrates impact.
 - The cover letter must be professional, 3-4 paragraphs, and directly connect the candidate's strengths to the job requirements.
-- Highlight matched skills as strengths. Acknowledge gaps honestly and frame them as areas of active growth.
+- CRITICAL: The alignment analysis above is the single source of truth. Every skill under MATCHED is a confirmed, verified strength — present it confidently. The ONLY gaps are skills explicitly listed under MISSING. Never mention, imply, or hedge about any matched skill being weak or underdeveloped.
+- If there are no skills under MISSING, do not mention any gaps or areas of growth at all.
 - Do not use generic filler language. Every sentence should be specific to this candidate and role.
 """
 
@@ -196,5 +198,6 @@ Rules:
 - Be honest and calibrated: a candidate missing 3 of 5 required skills should not score above 50 on Skill Match.
 - 80+ means strong fit, 50-79 means partial fit with notable gaps, below 50 means weak fit.
 - Skill Match scoring: use a two-step process. Step 1: compute a base score from the required skill match rate (matched_required / total_required * 100). Step 2: adjust based on preferred skills — each matched preferred skill adds a small bonus, missing most preferred skills subtracts a small penalty (up to ~10 points either way). Required skills should dominate this dimension; preferred skills are a secondary modifier. Do NOT average required and preferred together as equals.
+- Experience Relevance scoring: carefully compare the candidate's apparent experience level (from the cover letter and analysis evidence) against the job's required experience level. If the job requires N+ years and the candidate clearly has much less, this dimension should score proportionally lower. Do not give a high Experience Relevance score to a junior candidate applying for a senior role.
 - Reference specific skills, experiences, and cover letter content. No generic statements.
 """

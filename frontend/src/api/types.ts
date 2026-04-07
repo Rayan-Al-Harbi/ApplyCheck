@@ -40,6 +40,7 @@ export interface AnalyzeResponse {
   cover_letter: string;
   score: Score;
   trace_id: string;
+  analysis_id?: string;
 }
 
 export interface DisputedSkill {
@@ -55,6 +56,7 @@ export interface RescoreRequest {
   disputed_skills: DisputedSkill[];
   cv_suggestions: string[];
   original_score: Score;
+  analysis_id?: string;
 }
 
 // --- Auth ---

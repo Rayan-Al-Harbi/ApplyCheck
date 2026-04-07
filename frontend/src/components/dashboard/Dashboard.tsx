@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { getCV, getAnalyses, uploadCV, deleteAnalysis, deleteAllAnalyses } from "../../api/client";
 import type { CVResponse, AnalysisSummary } from "../../api/types";
-import Footer from "../Footer";
+import { AIDisclaimer } from "../Footer";
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -273,7 +273,7 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-      <Footer />
+      <AIDisclaimer />
     </div>
   );
 }
