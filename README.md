@@ -45,7 +45,7 @@ ApplyCheck takes a CV and a job posting, then runs them through a pipeline of sp
 | Layer | Technology |
 |-------|-----------|
 | **Orchestration** | LangGraph (multi-agent state graph) |
-| **LLM** | Groq API — gpt-oss-120b | llama-3.3-70b-versatile (Writer agent)
+| **LLM** | Groq API — gpt-oss-120b & llama-3.3-70b-versatile (Writer agent)|
 | **RAG** | Qdrant + sentence-transformers (all-MiniLM-L6-v2) |
 | **Backend** | FastAPI, SQLAlchemy, PostgreSQL |
 | **Frontend** | React + Vite + TypeScript + Tailwind CSS |
