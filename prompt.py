@@ -221,10 +221,10 @@ Return ONLY valid JSON matching this schema:
             "reasoning": "1-2 sentences on how directly the candidate's experience maps to the job responsibilities."
         }},
         {{
-            "dimension": "Overall Presentation",
+            "dimension": "Presentation Quality",
             "score": 0,
             "weight": 0.30,
-            "reasoning": "1-2 sentences on the coherence and completeness of the candidate's profile relative to the role."
+            "reasoning": "1-2 sentences on the full application: CV quality, cover letter quality, and how well they work together."
         }}
     ],
     "overall_score": 0,
@@ -248,6 +248,11 @@ Per-dimension scoring:
   - If "Candidate Experience Level" says "Not specified by the job", score purely on how well experience maps to responsibilities — do not penalize for years.
   - Otherwise, compare against the required level. By default, only professional (paid/industry) positions count toward years-of-experience requirements. However, if the job explicitly accepts non-professional experience (e.g., "internships and projects count", "academic projects welcome"), then those experience types count fully — do not penalize the candidate for lacking paid/industry experience when the job itself does not require it.
   - Score proportionally lower only when there is a genuine gap between what the job requires and what the candidate has.
+- Presentation Quality: evaluates the full application, not just the cover letter. Assess three things:
+    (1) Evidence quality: do the matched skills in the alignment analysis have strong, specific evidence (quantified achievements, concrete projects, named tools) or is the evidence vague and generic?
+    (2) Cover letter quality: is the cover letter specific to the role, does it connect the candidate's strengths to job requirements, and is it professional?
+    (3) Coherence: does the cover letter reinforce the evidence from the alignment analysis — grounding claims in the same concrete achievements — rather than making unsupported or generic statements?
+  - Do NOT score this dimension based on the cover letter alone. A candidate with strong, specific evidence for their matched skills and a decent cover letter should score higher than a candidate with weak evidence and a polished cover letter.
 
 Output:
 - Reference specific skills, experiences, and cover letter content. No generic statements.

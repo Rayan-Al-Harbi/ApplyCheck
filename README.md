@@ -38,7 +38,7 @@ ApplyCheck takes a CV and a job posting, then runs them through a pipeline of sp
 **Supervisor** orchestrates three subagents via LangGraph:
 - **Analyzer** — Extracts job profile, chunks and embeds CV into Qdrant, classifies skills by type, evaluates each skill with type-specific rules, returns alignment analysis
 - **Writer** — Generates CV suggestions and a tailored cover letter grounded in matched skill evidence
-- **Scorer** — Scores across three weighted dimensions (Skill Match, Experience Relevance, Overall Presentation) with experience level gap awareness
+- **Scorer** — Scores across three weighted dimensions (Skill Match, Experience Relevance, Presentation Quality) with experience level gap awareness
 
 ## Tech Stack
 

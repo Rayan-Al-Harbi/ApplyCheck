@@ -47,7 +47,7 @@ const AGENTS: AgentConfig[] = [
     thoughts: [
       "Evaluating Skill Match dimension...",
       "Scoring Experience Relevance dimension...",
-      "Assessing Overall Presentation quality...",
+      "Assessing Presentation Quality dimension...",
       "Computing weighted average across dimensions...",
       "Calibrating final score and generating summary...",
     ],
@@ -172,8 +172,11 @@ export default function AnalysisProgress({ completedAgents: realCompleted }: Pro
     <div className="animate-fade-up max-w-2xl mx-auto py-16">
       {/* Header */}
       <div className="text-center mb-10">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-xs font-semibold text-primary dark:text-indigo-300 tracking-wide uppercase mb-5">
-          <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+        <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full glass-card text-xs font-semibold text-primary dark:text-indigo-300 tracking-wide uppercase mb-5">
+          <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+            <path className="opacity-80" d="M22 12a10 10 0 01-10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+          </svg>
           Agents Working
         </div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Analyzing your application</h2>
