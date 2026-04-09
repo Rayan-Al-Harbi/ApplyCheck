@@ -73,7 +73,7 @@ export default function ScoreOverview({ score, previousScore }: Props) {
 }
 
 function DimensionBar({ dimension }: { dimension: Score["dimensions"][0] }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   return (
     <div>
       <button
