@@ -140,6 +140,13 @@ def analyze_authenticated(
         except Exception as e:
             from api.errors import friendly_error
             REQUEST_COUNT.labels(endpoint="/analyze/auth", status="error").inc()
+            logger.error("SSE analysis failed", extra={"event_data": {
+                "event": "request_error",
+                "endpoint": "/analyze/auth",
+                "trace_id": trace_id,
+                "error": str(e),
+                "error_type": type(e).__name__,
+            }}, exc_info=True)
             _status_code, msg = friendly_error(e)
             yield f"data: {json.dumps({'type': 'error', 'detail': msg})}\n\n"
         finally:
