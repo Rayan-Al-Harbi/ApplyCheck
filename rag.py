@@ -22,7 +22,7 @@ else:
     qdrant = QdrantClient(host=QDRANT_HOST, port=QDRANT_PORT)
 
 EMBEDDING_DIM = 384
-TOKEN_THRESHOLD = 200
+TOKEN_THRESHOLD = 600
 
 # Thread-safe bounded embedding cache
 _embedding_cache: OrderedDict[str, list[float]] = OrderedDict()

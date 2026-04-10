@@ -85,7 +85,7 @@ export default function UploadForm({ onSubmit, signInLink }: Props) {
           <textarea
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
-            placeholder="Paste the full job description here..."
+            placeholder="Paste the job description here..."
             rows={8}
             className="w-full rounded-xl border border-gray-200/80 dark:border-gray-600/50 px-4 py-3
                        bg-white/40 dark:bg-white/5
